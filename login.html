@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — Cafe Automate</title>
+<meta name="description" content="Sign in or create a new account at Cafe Automate.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍵</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/login.css">
+</head>
+<body class="auth-body">
+
+<!-- Background -->
+<div class="auth-bg"></div>
+
+<!-- Floating orbs -->
+<div class="auth-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<!-- Auth card -->
+<div class="auth-card">
+
+  <!-- Logo -->
+  <div class="auth-logo">
+    <div class="auth-logo-mark">☕</div>
+    <div class="auth-logo-text">
+      Cafe Automate
+      <small>Order · Sip · Repeat</small>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="auth-tabs">
+    <button class="auth-tab active" id="tabLogin">Login</button>
+    <button class="auth-tab" id="tabSignup">Sign Up</button>
+    <div class="auth-tab-slider" id="tabSlider"></div>
+  </div>
+
+  <!-- ── LOGIN FORM ── -->
+  <form class="auth-form" id="loginForm" novalidate>
+    <div class="auth-error" id="loginError"></div>
+
+    <div class="auth-field">
+      <label for="loginEmail">Email address</label>
+      <div class="auth-field-wrap">
+        <input type="email" id="loginEmail" placeholder="you@example.com" required autocomplete="email">
+      </div>
+    </div>
+
+    <div class="auth-field">
+      <label for="loginPassword">Password</label>
+      <div class="auth-field-wrap">
+        <input type="password" id="loginPassword" placeholder="Enter your password" required autocomplete="current-password">
+        <button type="button" class="pw-toggle" aria-label="Toggle password">👁</button>
+      </div>
+    </div>
+
+    <button type="submit" class="auth-submit" id="loginBtn">Sign In</button>
+
+    <p class="auth-footer">
+      New here? <button type="button" id="switchToSignup">Create an account</button>
+    </p>
+  </form>
+
+  <!-- ── SIGNUP FORM ── -->
+  <form class="auth-form hidden" id="signupForm" novalidate>
+    <div class="auth-error" id="signupError"></div>
+
+    <div class="auth-field">
+      <label for="signupName">Full name</label>
+      <div class="auth-field-wrap">
+        <input type="text" id="signupName" placeholder="Your full name" required autocomplete="name">
+      </div>
+    </div>
+
+    <div class="auth-field">
+      <label for="signupEmail">Email address</label>
+      <div class="auth-field-wrap">
+        <input type="email" id="signupEmail" placeholder="you@example.com" required autocomplete="email">
+      </div>
+    </div>
+
+    <div class="auth-field">
+      <label for="signupPassword">Password</label>
+      <div class="auth-field-wrap">
+        <input type="password" id="signupPassword" placeholder="Min. 6 characters" required autocomplete="new-password">
+        <button type="button" class="pw-toggle" aria-label="Toggle password">👁</button>
+      </div>
+    </div>
+
+    <div class="auth-field">
+      <label for="signupConfirm">Confirm password</label>
+      <div class="auth-field-wrap">
+        <input type="password" id="signupConfirm" placeholder="Repeat your password" required autocomplete="new-password">
+        <button type="button" class="pw-toggle" aria-label="Toggle confirm password">👁</button>
+      </div>
+    </div>
+
+    <button type="submit" class="auth-submit" id="signupBtn">Create Account</button>
+
+    <p class="auth-footer">
+      Already have an account? <button type="button" id="switchToLogin">Sign in</button>
+    </p>
+  </form>
+
+</div>
+
+<!-- Toast -->
+<div class="auth-toast" id="authToast"></div>
+
+<script src="js/auth.js"></script>
+</body>
+</html>

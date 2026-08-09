@@ -1,0 +1,44 @@
+/* ============================================================
+   Cafe Automate — Shared Design Tokens
+   Used by: main.css, login.css, dashboard.css
+   ============================================================ */
+:root {
+  /* Palette */
+  --bg: #f7ede0;
+  --card: #fffaf2;
+  --sand: #e9c6a3;
+  --clay: #c1592e;
+  --clay-dark: #92401f;
+  --gold: #d9a256;
+  --charcoal: #221a15;
+  --charcoal-soft: #3c3128;
+  --ink: #271c14;
+  --ink-soft: #7c6a5b;
+  --sky: #3f6f92;
+  --sage: #6f8f5c;
+  --cream: #fff2e2;
+
+  /* Status colours */
+  --status-pending: #d9a256;
+  --status-received: #3f6f92;
+  --status-delivered: #6f8f5c;
+  --status-sold-out: #c0392b;
+
+  /* Geometry */
+  --radius: 20px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+
+  /* Shadows */
+  --shadow: 0 14px 34px -14px rgba(34,22,12,0.38);
+  --shadow-soft: 0 6px 18px -10px rgba(34,22,12,0.22);
+  --shadow-md: 0 10px 28px -8px rgba(34,22,12,0.30);
+
+  /* Fonts */
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Outfit', sans-serif;
+
+  /* Transitions */
+  --ease: 0.25s ease;
+  --ease-spring: 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+}

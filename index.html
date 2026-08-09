@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cafe Automate — Order Ahead</title>
+<meta name="description" content="Cafe Automate — artisan coffee and a real kitchen. Order ahead, browse today's picks, or see the full menu.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍵</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header id="siteHeader">
+  <div class="logo">
+    <div class="logo-mark">☕</div>
+    <div class="logo-text">Cafe Automate<span>Order · Sip · Repeat</span></div>
+  </div>
+  <nav id="mainNav">
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#daily-menu">Daily Menu</a></li>
+      <li><a href="#all-menu">All Menu</a></li>
+      <li><a href="#contact">Contact Us</a></li>
+    </ul>
+  </nav>
+  <div class="header-actions">
+    <a href="login.html" class="nav-login-btn" id="navLoginBtn">Login</a>
+    <button class="cart-btn" id="openCart" aria-label="Open cart">
+      🧺 <span class="cart-count" id="cartCount">0</span>
+    </button>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+  </div>
+</header>
+
+<!-- ============ HOME / HERO ============ -->
+<section id="home">
+  <div class="hero-photo">
+    <div class="hero-content">
+      <h1 class="hero-title">Real coffee.<br>A real <em>kitchen.</em><br>Ready fast.</h1>
+      <p class="hero-sub">Cafe Automate blends artisan coffee with self-serve simplicity — pick your favorites, watch the ticket tally up, and pick up at the counter or drive-through.</p>
+      <div class="hero-cta">
+        <a href="#all-menu" class="btn-primary">Order Now <span>→</span></a>
+        <a href="#daily-menu" class="btn-ghost">See Today's Picks</a>
+      </div>
+      <div class="hero-stats">
+        <div><strong>4.9★</strong><span>1,200+ Reviews</span></div>
+        <div><strong>500+</strong><span>Orders / week</span></div>
+        <div><strong>16</strong><span>Menu Items</span></div>
+        <div><strong>0</strong><span>Minutes in line</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="marquee">
+    <div class="marquee-track">
+      <span>☕ Single-origin espresso</span>
+      <span>🥐 Baked fresh every morning</span>
+      <span>🍊 Cold-pressed juices</span>
+      <span>🧊 Small-batch cold brew</span>
+      <span>🌱 Locally roasted beans</span>
+      <span>☕ Single-origin espresso</span>
+      <span>🥐 Baked fresh every morning</span>
+      <span>🍊 Cold-pressed juices</span>
+      <span>🧊 Small-batch cold brew</span>
+      <span>🌱 Locally roasted beans</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY US ============ -->
+<div class="strip" id="why">
+  <div class="strip-card">
+    <div class="icon">⚡</div>
+    <h3>Order in seconds</h3>
+    <p>No lines, no waiting on hold — build your cup and food order right from your phone.</p>
+  </div>
+  <div class="strip-card">
+    <div class="icon">🌸</div>
+    <h3>Small-batch &amp; fresh</h3>
+    <p>Pastries baked each morning, beans roasted weekly, syrups made in-house.</p>
+  </div>
+  <div class="strip-card">
+    <div class="icon">📍</div>
+    <h3>Pickup, your way</h3>
+    <p>Grab it at the counter or the drive-through window — just show your order ticket.</p>
+  </div>
+</div>
+
+<!-- ============ DAILY MENU ============ -->
+<section class="section" id="daily-menu">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">Today's Picks</span>
+      <h2>Daily Menu</h2>
+      <p>A short list of what's tasting best this morning — rotated daily by the kitchen.</p>
+    </div>
+  </div>
+  <div class="daily-grid" id="dailyGrid">
+    <div class="daily-empty" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-soft)">Loading today's menu…</div>
+  </div>
+  <div class="daily-note">
+    <span style="font-size:1.4rem;">🕐</span>
+    <p><strong>Today's kitchen note:</strong> Items are updated fresh each morning. Order ahead to skip the wait!</p>
+  </div>
+</section>
+
+<!-- ============ ALL MENU ============ -->
+<section class="section" id="all-menu">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">Everything We Make</span>
+      <h2>All Menu</h2>
+      <p>Tap the + on anything that looks good — your ticket updates instantly.</p>
+    </div>
+  </div>
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-cat="all">All</button>
+    <button class="tab" data-cat="food">Food</button>
+    <button class="tab" data-cat="drink">Drink</button>
+  </div>
+  <div class="menu-grid" id="menuGrid">
+    <div class="menu-empty" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-soft)">Loading menu…</div>
+  </div>
+</section>
+
+<!-- ============ CONTACT US ============ -->
+<section class="section" id="contact">
+  <div class="contact-wrap">
+    <div class="contact-info">
+      <span class="eyebrow">Get In Touch</span>
+      <h2>Visit or say hello</h2>
+      <p>Have a catering request, feedback, or just want to say hi? Reach out — a real human reads every message.</p>
+      <ul class="contact-list">
+        <li><div class="ic">📍</div><div><h4>Address</h4><p>221 Blossom Lane, Lahore</p></div></li>
+        <li><div class="ic">🕐</div><div><h4>Hours</h4><p>Open daily · 7am – 9pm</p></div></li>
+        <li><div class="ic">📞</div><div><h4>Phone</h4><a href="tel:+923000000000">+92 300 000 0000</a></div></li>
+        <li><div class="ic">✉️</div><div><h4>Email</h4><a href="mailto:hello@cafeautomate.com">hello@cafeautomate.com</a></div></li>
+      </ul>
+      <div class="social-row">
+        <a href="#" aria-label="Instagram">📷</a>
+        <a href="#" aria-label="Facebook">📘</a>
+        <a href="#" aria-label="Twitter">🐦</a>
+      </div>
+    </div>
+    <form class="contact-form" id="contactForm" novalidate>
+      <h3>Send us a message</h3>
+      <p class="hint">We read every message — no bots, no filters.</p>
+      <div id="contactSuccess" class="contact-msg-success">✓ Message sent! We'll get back to you soon.</div>
+      <div class="field">
+        <label for="cName">Your name</label>
+        <input type="text" id="cName" placeholder="Jane Smith" required>
+      </div>
+      <div class="field">
+        <label for="cEmail">Email address</label>
+        <input type="email" id="cEmail" placeholder="jane@example.com" required>
+      </div>
+      <div class="field">
+        <label for="cMsg">Message</label>
+        <textarea id="cMsg" rows="4" placeholder="Your message…" required></textarea>
+      </div>
+      <button type="submit" class="btn-primary" id="contactBtn">Send Message →</button>
+    </form>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="logo-text">Cafe Automate<span>Order · Sip · Repeat</span></div>
+  <p>© 2026 Cafe Automate · Lahore · All rights reserved</p>
+</footer>
+
+<!-- ============ CART DRAWER ============ -->
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="cartDrawer" role="dialog" aria-label="Shopping cart">
+  <div class="drawer-head">
+    <h2>Your Order 🧺</h2>
+    <button class="close-btn" onclick="closeDrawer()" aria-label="Close cart">✕</button>
+  </div>
+  <div class="drawer-items" id="cartItems">
+    <div class="empty-cart"><div class="emoji">🧺</div><p>Your cart is empty.<br>Add something delicious!</p></div>
+  </div>
+  <div class="drawer-foot">
+    <div class="drawer-total">
+      <span>Total</span>
+      <span>Rs <span id="cartTotalAmt">0</span></span>
+    </div>
+    <button class="checkout-btn" id="checkoutBtn" disabled onclick="handleCheckout()">Checkout →</button>
+  </div>
+</div>
+
+<!-- ============ ORDER CONFIRMATION MODAL ============ -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <div class="icon-circle">✅</div>
+    <h3>Order Placed!</h3>
+    <p>Your order <span class="order-id" id="confirmOrderId">#0000</span> is confirmed.<br>Total: <strong> <span id="confirmTotal">0</span></strong></p>
+    <div id="confirmPayBlock"></div>
+    <p style="font-size:.82rem;margin-top:8px;color:var(--ink-soft)">Transfer the amount using the details above. Your Cafe Admin will confirm once payment is received.</p>
+    <br>
+    <button class="btn-primary" style="width:100%;justify-content:center" onclick="closeConfirmModal()">Got it!</button>
+    <br><br>
+    <a href="dashboard-user.html" style="font-size:.84rem;color:var(--clay);font-weight:600;text-decoration:underline">Track my orders →</a>
+  </div>
+</div>
+
+<!-- SignalR CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+<script src="js/api.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/orders.js"></script>
+<script>
+// ── Header nav + cart ──────────────────────────────────────────
+document.getElementById('openCart').addEventListener('click', openDrawer);
+document.getElementById('navToggle')?.addEventListener('click', () => {
+  document.getElementById('siteHeader').classList.toggle('nav-open');
+});
+
+function openDrawer()  { document.getElementById('cartDrawer').classList.add('open'); document.getElementById('overlay').classList.add('open'); }
+function closeDrawer() { document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
+
+// ── Contact form ───────────────────────────────────────────────
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn  = document.getElementById('contactBtn');
+  btn.textContent = 'Sending…';
+  btn.style.pointerEvents = 'none';
+
+  try {
+    await apiFetch('/contact', {
+      method: 'POST',
+      body: JSON.stringify({
+        name:    document.getElementById('cName').value.trim(),
+        email:   document.getElementById('cEmail').value.trim(),
+        message: document.getElementById('cMsg').value.trim()
+      })
+    });
+    document.getElementById('contactSuccess').classList.add('show');
+    e.target.reset();
+  } catch (err) {
+    showToast(err.message || 'Could not send message.', 'error');
+  } finally {
+    btn.textContent = 'Send Message →';
+    btn.style.pointerEvents = '';
+  }
+});
+
+// ── Login / user header button ─────────────────────────────────
+(function updateNavForUser() {
+  const user = getUser();
+  const btn  = document.getElementById('navLoginBtn');
+  if (!btn) return;
+  if (user) {
+    btn.textContent = 'My Orders';
+    btn.href = 'dashboard-user.html';
+  }
+})();
+</script>
+</body>
+</html>

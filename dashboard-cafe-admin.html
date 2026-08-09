@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cafe Admin — Cafe Automate</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍵</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+<div class="dash-topbar">
+  <div class="dash-logo">
+    <div class="dash-logo-mark">☕</div>
+    <div class="dash-logo-text">Cafe Automate<small>Cafe Admin</small></div>
+  </div>
+  <div class="dash-user-info">
+    <span class="dash-role-badge">Cafe Admin</span>
+    <span class="dash-user-name" id="topbarName">—</span>
+    <button class="dash-logout-btn" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="dash-layout">
+  <aside class="dash-sidebar">
+    <button class="dash-nav-item active" onclick="showPanel('orders')"     id="nav-orders"><span class="dash-nav-icon">📋</span> Orders</button>
+    <button class="dash-nav-item"        onclick="showPanel('daily-menu')" id="nav-daily-menu"><span class="dash-nav-icon">🌅</span> Daily Menu</button>
+    <button class="dash-nav-item"        onclick="showPanel('payment')"    id="nav-payment"><span class="dash-nav-icon">🏦</span> Payment Details</button>
+  </aside>
+
+  <main class="dash-main">
+
+    <!-- ── Orders ─────────────────────────────────────────────── -->
+    <div class="dash-panel active" id="panel-orders">
+      <h1 class="dash-page-title">Live Orders</h1>
+      <p class="dash-page-sub">Incoming orders appear instantly. Update status once you start preparing.</p>
+      <div class="stats-row" id="orderStats">
+        <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value" id="cntPending">—</div></div>
+        <div class="stat-card"><div class="stat-label">Received</div><div class="stat-value" id="cntReceived">—</div></div>
+        <div class="stat-card"><div class="stat-label">Delivered</div><div class="stat-value" id="cntDelivered">—</div></div>
+        <div class="stat-card"><div class="stat-label">Unpaid</div><div class="stat-value" id="cntUnpaid">—</div></div>
+      </div>
+      <div class="section-card">
+        <div class="section-card-head"><h3>Order Queue</h3></div>
+        <div id="ordersTable"><div class="empty-state"><div class="empty-icon">⌛</div><h4>Loading…</h4></div></div>
+      </div>
+    </div>
+
+    <!-- ── Daily Menu ─────────────────────────────────────────── -->
+    <div class="dash-panel" id="panel-daily-menu">
+      <h1 class="dash-page-title">Today's Daily Menu</h1>
+      <p class="dash-page-sub">Items added here appear on the public site today.</p>
+
+      <div class="section-card">
+        <div class="section-card-head"><h3 id="dailyFormTitle">Add Item for Today</h3></div>
+        <form class="dash-form" id="dailyForm" onsubmit="submitDailyItem(event)">
+          <input type="hidden" id="dailyEditId">
+          <div class="form-row">
+            <div class="form-group"><label>Item name</label><input type="text" id="dName" placeholder="e.g. Rose Latte" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Price (Rs)</label><input type="number" id="dPrice" placeholder="350" min="1" required></div>
+            <div class="form-group"><label>Quantity</label><input type="number" id="dQty" placeholder="10" min="1" required></div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button type="submit" class="btn btn-clay" id="dailySubmitBtn">Add Item</button>
+            <button type="button" class="btn btn-ghost-sm" onclick="resetDailyForm()">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="section-card">
+        <div class="section-card-head"><h3>Today's Items</h3></div>
+        <div id="dailyItemsTable"><div class="empty-state"><div class="empty-icon">🌅</div><h4>No items yet today</h4></div></div>
+      </div>
+    </div>
+
+    <!-- ── Payment Details ────────────────────────────────────── -->
+    <div class="dash-panel" id="panel-payment">
+      <h1 class="dash-page-title">Bank / Card Transfer Details</h1>
+      <p class="dash-page-sub">These details are shown to customers at checkout so they can pay you directly.</p>
+      <div class="section-card">
+        <form class="dash-form" id="paymentForm" onsubmit="savePaymentDetails(event)">
+          <div class="form-row">
+            <div class="form-group"><label>Account holder name</label><input type="text" id="pHolder" required></div>
+            <div class="form-group"><label>Bank name</label><input type="text" id="pBank" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Account number</label><input type="text" id="pAccNum" required></div>
+            <div class="form-group"><label>IBAN / Card number</label><input type="text" id="pIBAN"></div>
+          </div>
+          <div class="form-group"><label>Instructions for customer</label><textarea id="pInstr" rows="3" placeholder="e.g. Transfer the exact amount and WhatsApp a screenshot to confirm."></textarea></div>
+          <button type="submit" class="btn btn-clay">Save Payment Details</button>
+        </form>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+<script src="js/api.js"></script>
+<script>
+(function guard() {
+  const u = getUser();
+  if (!u) { window.location.href = 'login.html'; return; }
+  if (u.role !== 2) { window.location.href = 'login.html'; return; }
+  document.getElementById('topbarName').textContent = u.name;
+})();
+
+function showPanel(id) {
+  document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.dash-nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.getElementById('nav-' + id).classList.add('active');
+}
+
+// ── Orders ───────────────────────────────────────────────────
+let allOrders = [];
+
+function osClass(s) { return { Pending:'badge-pending', Received:'badge-received', Delivered:'badge-delivered' }[s]||''; }
+function psClass(s) { return s==='Received'?'badge-received':'badge-pending'; }
+
+function renderOrders() {
+  const c = document.getElementById('ordersTable');
+  if (!allOrders.length) { c.innerHTML = `<div class="empty-state"><div class="empty-icon">🎉</div><h4>No orders yet</h4></div>`; return; }
+
+  c.innerHTML = `<div style="overflow-x:auto"><table class="data-table">
+    <thead><tr>
+      <th>#</th><th>Customer</th><th>Total</th><th>Order Status</th><th>Payment</th><th>Time</th><th>Actions</th>
+    </tr></thead>
+    <tbody>${allOrders.map(o => `
+      <tr>
+        <td><strong>#${String(o.id).padStart(4,'0')}</strong></td>
+        <td>${escHtml(o.userName)}<br><small style="color:var(--ink-soft)">${escHtml(o.userEmail)}</small></td>
+        <td><strong>Rs ${o.totalAmount.toFixed(0)}</strong></td>
+        <td>
+          <select class="form-group select" style="padding:6px 10px;border-radius:999px;font-size:.78rem;border:1px solid var(--sand);background:var(--cream);cursor:pointer"
+            onchange="updateOrderStatus(${o.id},this.value)">
+            ${['Pending','Received','Delivered'].map(s => `<option value="${s}" ${s===o.orderStatus?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </td>
+        <td>
+          <select class="form-group select" style="padding:6px 10px;border-radius:999px;font-size:.78rem;border:1px solid var(--sand);background:var(--cream);cursor:pointer"
+            onchange="updatePaymentStatus(${o.id},this.value)">
+            ${['Pending','Received'].map(s => `<option value="${s}" ${s===o.paymentStatus?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </td>
+        <td style="font-size:.78rem;color:var(--ink-soft)">${new Date(o.createdAt).toLocaleString()}</td>
+        <td><button class="btn-ghost-sm" onclick="toggleItems(${o.id})">Items</button></td>
+      </tr>
+      <tr><td colspan="7" style="padding:0">
+        <div class="order-items-list" id="items-${o.id}">
+          ${o.items.map(i=>`<div class="order-item-row"><span>${escHtml(i.itemName)} ×${i.quantity}</span><span>Rs ${i.lineTotal.toFixed(0)}</span></div>`).join('')}
+        </div>
+      </td></tr>`).join('')}
+    </tbody></table></div>`;
+
+  // stats
+  document.getElementById('cntPending').textContent   = allOrders.filter(o=>o.orderStatus==='Pending').length;
+  document.getElementById('cntReceived').textContent  = allOrders.filter(o=>o.orderStatus==='Received').length;
+  document.getElementById('cntDelivered').textContent = allOrders.filter(o=>o.orderStatus==='Delivered').length;
+  document.getElementById('cntUnpaid').textContent    = allOrders.filter(o=>o.paymentStatus==='Pending').length;
+}
+
+function toggleItems(id) { document.getElementById('items-'+id)?.classList.toggle('open'); }
+
+async function updateOrderStatus(id, status) {
+  try { await apiFetch(`/orders/${id}/order-status`,{method:'PATCH',body:JSON.stringify({status})}); showToast('Order status updated','success'); } catch(e){showToast(e.message,'error');}
+}
+async function updatePaymentStatus(id, status) {
+  try { await apiFetch(`/orders/${id}/payment-status`,{method:'PATCH',body:JSON.stringify({status})}); showToast('Payment status updated','success'); } catch(e){showToast(e.message,'error');}
+}
+
+async function loadOrders() {
+  try { allOrders = await apiFetch('/orders') || []; renderOrders(); } catch { /* silent */ }
+}
+
+// ── Daily Menu ───────────────────────────────────────────────
+let dailyItems = [];
+
+async function loadDailyItems() {
+  try {
+    dailyItems = await apiFetch('/daily-menu') || [];
+    renderDailyItems();
+  } catch { /* silent */ }
+}
+
+function renderDailyItems() {
+  const c = document.getElementById('dailyItemsTable');
+  if (!dailyItems.length) { c.innerHTML = `<div class="empty-state"><div class="empty-icon">🌅</div><h4>No items yet today</h4><p>Add the first item above.</p></div>`; return; }
+  c.innerHTML = `<table class="data-table"><thead><tr><th>Item</th><th>Price</th><th>Qty</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+    ${dailyItems.map(i=>`<tr>
+      <td><strong>${escHtml(i.name)}</strong></td>
+      <td>Rs ${i.price}</td>
+      <td>${i.quantity}</td>
+      <td><span class="badge-pill ${i.status==='Available'?'badge-available':'badge-soldout'}">${i.status}</span></td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn-ghost-sm" onclick="editDailyItem(${i.id})">Edit</button>
+        <button class="btn-ghost-sm" onclick="toggleDailyStatus(${i.id})">${i.status==='Available'?'Mark Sold Out':'Mark Available'}</button>
+        <button class="btn-danger"   onclick="deleteDailyItem(${i.id})">Delete</button>
+      </td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+
+async function submitDailyItem(e) {
+  e.preventDefault();
+  const editId = document.getElementById('dailyEditId').value;
+  const body = { name: document.getElementById('dName').value, price: parseFloat(document.getElementById('dPrice').value), quantity: parseInt(document.getElementById('dQty').value) };
+  try {
+    if (editId) { await apiFetch(`/daily-menu/${editId}`,{method:'PUT',body:JSON.stringify(body)}); showToast('Item updated','success'); }
+    else        { await apiFetch('/daily-menu',{method:'POST',body:JSON.stringify(body)}); showToast('Item added','success'); }
+    resetDailyForm(); loadDailyItems();
+  } catch(err) {
+    // The item was deleted elsewhere while this page held a stale copy.
+    if (editId && /404|no longer exists/i.test(err.message)) {
+      showToast('That item no longer exists — list refreshed. Add it as a new item.','error');
+      resetDailyForm(); loadDailyItems();
+      return;
+    }
+    showToast(err.message,'error');
+  }
+}
+
+function editDailyItem(id) {
+  const item = dailyItems.find(i=>i.id===id);
+  if (!item) return;
+  document.getElementById('dailyEditId').value = id;
+  document.getElementById('dName').value  = item.name;
+  document.getElementById('dPrice').value = item.price;
+  document.getElementById('dQty').value   = item.quantity;
+  document.getElementById('dailyFormTitle').textContent = 'Edit Item';
+  document.getElementById('dailySubmitBtn').textContent = 'Save Changes';
+}
+
+function resetDailyForm() {
+  document.getElementById('dailyEditId').value = '';
+  document.getElementById('dailyForm').reset();
+  document.getElementById('dailyFormTitle').textContent = 'Add Item for Today';
+  document.getElementById('dailySubmitBtn').textContent = 'Add Item';
+}
+
+async function toggleDailyStatus(id) {
+  try { await apiFetch(`/daily-menu/${id}/status`,{method:'PATCH'}); showToast('Status toggled','success'); loadDailyItems(); } catch(e){showToast(e.message,'error');}
+}
+
+async function deleteDailyItem(id) {
+  if (!confirm('Delete this item?')) return;
+  try { await apiFetch(`/daily-menu/${id}`,{method:'DELETE'}); showToast('Item deleted'); loadDailyItems(); } catch(e){showToast(e.message,'error');}
+}
+
+// ── Payment Details ──────────────────────────────────────────
+async function loadPaymentDetails() {
+  try {
+    const d = await apiFetch('/cafe-payment-details');
+    if (!d) return;
+    document.getElementById('pHolder').value = d.accountHolderName;
+    document.getElementById('pBank').value   = d.bankName;
+    document.getElementById('pAccNum').value = d.accountNumber;
+    document.getElementById('pIBAN').value   = d.iBANOrCardNumber;
+    document.getElementById('pInstr').value  = d.instructions;
+  } catch { /* not set yet */ }
+}
+
+async function savePaymentDetails(e) {
+  e.preventDefault();
+  try {
+    await apiFetch('/cafe-payment-details', {
+      method: 'PUT',
+      body: JSON.stringify({
+        accountHolderName: document.getElementById('pHolder').value,
+        bankName:          document.getElementById('pBank').value,
+        accountNumber:     document.getElementById('pAccNum').value,
+        iBANOrCardNumber:  document.getElementById('pIBAN').value,
+        instructions:      document.getElementById('pInstr').value
+      })
+    });
+    showToast('Payment details saved!', 'success');
+  } catch(err) { showToast(err.message, 'error'); }
+}
+
+// ── SignalR ──────────────────────────────────────────────────
+async function setupSignalR() {
+  const hub = await getHubConnection();
+  if (!hub) return;
+  await hub.invoke('JoinCafeAdminGroup').catch(()=>{});
+  hub.on('NewOrder', order => {
+    allOrders.unshift(order);
+    renderOrders();
+    showToast('New order #' + String(order.id).padStart(4,'0') + ' from ' + order.userName + '!', 'success');
+  });
+}
+
+function escHtml(s=''){const d=document.createElement('div');d.textContent=String(s);return d.innerHTML;}
+
+loadOrders();
+loadDailyItems();
+loadPaymentDetails();
+setupSignalR();
+</script>
+</body>
+</html>

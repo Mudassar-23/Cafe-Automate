@@ -1,0 +1,66 @@
+services:
+
+  # ── Frontend (nginx) ──────────────────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5500:80"        # http://localhost:5500  → public site
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── Backend (ASP.NET Core API) ────────────────────────────────
+  backend:
+    build:
+      context: ./CafeAutomate.Api
+      dockerfile: Dockerfile
+    ports:
+      - "5112:8080"      # http://localhost:5112  → Swagger / direct API access
+    env_file:
+      - .env             # loads Jwt__Secret and Seed__* variables
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_HTTP_PORTS: "8080"
+      # Override the .env values: inside the network the database is "db",
+      # not localhost. Falls back to the SQLite volume if Postgres is down.
+      DATABASE_URL: "postgresql://postgres:${POSTGRES_PASSWORD:-changeme}@db:5432/cafe"
+      DATABASE_FALLBACK_URL: "sqlite:////app/Data/cafe.db"
+    volumes:
+      # Persist the SQLite database (used as fallback if Postgres is disabled)
+      - cafe_sqlite:/app/Data
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/api/all-menu || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+
+  # ── Database (PostgreSQL) ─────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"      # exposed for DB tools (TablePlus, pgAdmin, etc.)
+    environment:
+      POSTGRES_DB: cafe
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cafe"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  cafe_sqlite:

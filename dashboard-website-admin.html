@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Website Admin — Cafe Automate</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍵</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+<div class="dash-topbar">
+  <div class="dash-logo">
+    <div class="dash-logo-mark">☕</div>
+    <div class="dash-logo-text">Cafe Automate<small>Website Admin</small></div>
+  </div>
+  <div class="dash-user-info">
+    <span class="dash-role-badge" style="background:var(--sky)">Website Admin</span>
+    <span class="dash-user-name" id="topbarName">—</span>
+    <button class="dash-logout-btn" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="dash-layout">
+  <aside class="dash-sidebar">
+    <button class="dash-nav-item active" onclick="showPanel('all-menu')"  id="nav-all-menu"><span class="dash-nav-icon">📖</span> All Menu</button>
+    <button class="dash-nav-item"        onclick="showPanel('orders')"    id="nav-orders"><span class="dash-nav-icon">📋</span> Orders</button>
+    <button class="dash-nav-item"        onclick="showPanel('users')"     id="nav-users"><span class="dash-nav-icon">👥</span> Users</button>
+    <button class="dash-nav-item"        onclick="showPanel('inbox')"     id="nav-inbox"><span class="dash-nav-icon">✉️</span> Inbox <span id="unreadBadge" style="background:var(--clay);color:#fff;border-radius:999px;font-size:.68rem;padding:2px 7px;margin-left:4px;display:none"></span></button>
+    <button class="dash-nav-item"        onclick="showPanel('daily-view')" id="nav-daily-view"><span class="dash-nav-icon">🌅</span> Daily Menu</button>
+  </aside>
+
+  <main class="dash-main">
+
+    <!-- ── All Menu CRUD ──────────────────────────────────────── -->
+    <div class="dash-panel active" id="panel-all-menu">
+      <h1 class="dash-page-title">All Menu</h1>
+      <p class="dash-page-sub">These items appear on the public site indefinitely.</p>
+
+      <div class="section-card">
+        <div class="section-card-head"><h3 id="allMenuFormTitle">Add Menu Item</h3></div>
+        <form class="dash-form" id="allMenuForm" onsubmit="submitAllMenuItem(event)">
+          <input type="hidden" id="amEditId">
+          <div class="form-row">
+            <div class="form-group"><label>Name</label><input type="text" id="amName" required placeholder="e.g. Flat White"></div>
+            <div class="form-group"><label>Category</label>
+              <select id="amCat">
+                <option value="food">Food</option>
+                <option value="drink">Drink</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Price (Rs)</label><input type="number" id="amPrice" min="1" required placeholder="450"></div>
+            <div class="form-group"><label>Emoji</label><input type="text" id="amEmoji" maxlength="4" placeholder="☕"></div>
+          </div>
+          <div class="form-group"><label>Description</label><textarea id="amDesc" rows="2" placeholder="Short description…"></textarea></div>
+          <div class="toggle-wrap">
+            <input type="checkbox" class="toggle" id="amAvail" checked>
+            <label for="amAvail" style="font-size:.88rem;font-weight:500">Available on site</label>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button type="submit" class="btn btn-clay" id="amSubmitBtn">Add Item</button>
+            <button type="button" class="btn btn-ghost-sm" onclick="resetAllMenuForm()">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="section-card">
+        <div class="section-card-head"><h3>Current Items</h3></div>
+        <div id="allMenuTable"><div class="empty-state"><div class="empty-icon">📖</div><h4>Loading…</h4></div></div>
+      </div>
+    </div>
+
+    <!-- ── Orders (view-only) ─────────────────────────────────── -->
+    <div class="dash-panel" id="panel-orders">
+      <h1 class="dash-page-title">All Orders</h1>
+      <p class="dash-page-sub">View-only oversight. Cafe Admin manages statuses.</p>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Total Orders</div><div class="stat-value" id="wa-cntTotal">—</div></div>
+        <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value" id="wa-cntPending">—</div></div>
+        <div class="stat-card"><div class="stat-label">Delivered</div><div class="stat-value" id="wa-cntDelivered">—</div></div>
+        <div class="stat-card"><div class="stat-label">Paid</div><div class="stat-value" id="wa-cntPaid">—</div></div>
+      </div>
+      <div class="section-card">
+        <div id="allOrdersTable"><div class="empty-state"><div class="empty-icon">⌛</div><h4>Loading…</h4></div></div>
+      </div>
+    </div>
+
+    <!-- ── Users ──────────────────────────────────────────────── -->
+    <div class="dash-panel" id="panel-users">
+      <h1 class="dash-page-title">Users</h1>
+      <p class="dash-page-sub">All customer and Cafe Admin accounts. Enable, disable, reset a password, or remove an account.</p>
+      <div class="section-card">
+        <div id="usersTable"><div class="empty-state"><div class="empty-icon">👥</div><h4>Loading…</h4></div></div>
+      </div>
+    </div>
+
+    <!-- ── Inbox ──────────────────────────────────────────────── -->
+    <div class="dash-panel" id="panel-inbox">
+      <h1 class="dash-page-title">Contact Inbox</h1>
+      <p class="dash-page-sub">Messages submitted via the Contact Us form.</p>
+      <div id="inboxContainer"><div class="empty-state"><div class="empty-icon">✉️</div><h4>Loading…</h4></div></div>
+    </div>
+
+    <!-- ── Daily Menu view-only ───────────────────────────────── -->
+    <div class="dash-panel" id="panel-daily-view">
+      <h1 class="dash-page-title">Today's Daily Menu</h1>
+      <p class="dash-page-sub">Read-only view — Cafe Admin manages these items.</p>
+      <div class="section-card">
+        <div id="dailyViewTable"><div class="empty-state"><div class="empty-icon">🌅</div><h4>Loading…</h4></div></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+<script src="js/api.js"></script>
+<script>
+(function guard() {
+  const u = getUser();
+  if (!u) { window.location.href = 'login.html'; return; }
+  if (u.role !== 1) { window.location.href = 'login.html'; return; }
+  document.getElementById('topbarName').textContent = u.name;
+})();
+
+function showPanel(id) {
+  document.querySelectorAll('.dash-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.dash-nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+}
+
+function escHtml(s=''){const d=document.createElement('div');d.textContent=String(s);return d.innerHTML;}
+
+// ── All Menu ─────────────────────────────────────────────────
+let allMenuItems = [];
+
+async function loadAllMenu() {
+  try {
+    allMenuItems = await apiFetch('/all-menu') || [];
+    renderAllMenu();
+  } catch { /* silent */ }
+}
+
+function renderAllMenu() {
+  const c = document.getElementById('allMenuTable');
+  if (!allMenuItems.length) { c.innerHTML=`<div class="empty-state"><div class="empty-icon">📖</div><h4>No menu items yet</h4><p>Add the first one above.</p></div>`; return; }
+  c.innerHTML=`<div style="overflow-x:auto"><table class="data-table"><thead><tr>
+    <th>Name</th><th>Category</th><th>Price</th><th>Available</th><th>Actions</th>
+  </tr></thead><tbody>${allMenuItems.map(i=>`<tr>
+    <td>
+      <span style="font-size:1.5rem;margin-right:8px;vertical-align:middle">${escHtml(i.emoji || '☕')}</span>
+      <strong>${escHtml(i.name)}</strong>
+      ${i.description?`<p style="font-size:.78rem;color:var(--ink-soft);margin-top:2px">${escHtml(i.description)}</p>`:''}
+    </td>
+    <td><span class="badge-pill badge-received" style="font-size:.7rem">${i.category}</span></td>
+    <td><strong>Rs ${i.price}</strong></td>
+    <td><span class="badge-pill ${i.isAvailable?'badge-available':'badge-soldout'}">${i.isAvailable?'Available':'Unavailable'}</span></td>
+    <td style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn-ghost-sm" onclick="editAllMenuItem(${i.id})">Edit</button>
+      <button class="btn-danger"   onclick="deleteAllMenuItem(${i.id})">Delete</button>
+    </td>
+  </tr>`).join('')}</tbody></table></div>`;
+}
+
+async function submitAllMenuItem(e) {
+  e.preventDefault();
+  const editId = document.getElementById('amEditId').value;
+  const body = {
+    name:        document.getElementById('amName').value,
+    description: document.getElementById('amDesc').value,
+    price:       parseFloat(document.getElementById('amPrice').value),
+    emoji:       document.getElementById('amEmoji').value.trim() || '☕',
+    category:    document.getElementById('amCat').value,
+    isAvailable: document.getElementById('amAvail').checked
+  };
+  try {
+    if (editId) { await apiFetch(`/all-menu/${editId}`,{method:'PUT',body:JSON.stringify(body)}); showToast('Item updated','success'); }
+    else        { await apiFetch('/all-menu',{method:'POST',body:JSON.stringify(body)}); showToast('Item added','success'); }
+    resetAllMenuForm(); loadAllMenu();
+  } catch(err) { showToast(err.message,'error'); }
+}
+
+function editAllMenuItem(id) {
+  const item = allMenuItems.find(i=>i.id===id);
+  if (!item) return;
+  document.getElementById('amEditId').value = id;
+  document.getElementById('amName').value   = item.name;
+  document.getElementById('amDesc').value   = item.description;
+  document.getElementById('amPrice').value  = item.price;
+  document.getElementById('amEmoji').value  = item.emoji || '☕';
+  document.getElementById('amCat').value    = item.category;
+  document.getElementById('amAvail').checked= item.isAvailable;
+  document.getElementById('allMenuFormTitle').textContent = 'Edit Menu Item';
+  document.getElementById('amSubmitBtn').textContent = 'Save Changes';
+}
+
+function resetAllMenuForm() {
+  document.getElementById('amEditId').value = '';
+  document.getElementById('allMenuForm').reset();
+  document.getElementById('amAvail').checked = true;
+  document.getElementById('allMenuFormTitle').textContent = 'Add Menu Item';
+  document.getElementById('amSubmitBtn').textContent = 'Add Item';
+}
+
+async function deleteAllMenuItem(id) {
+  if (!confirm('Delete this menu item? This cannot be undone.')) return;
+  try { await apiFetch(`/all-menu/${id}`,{method:'DELETE'}); showToast('Item deleted'); loadAllMenu(); } catch(e){showToast(e.message,'error');}
+}
+
+// ── Orders view-only ─────────────────────────────────────────
+let allOrders = [];
+
+async function loadOrders() {
+  try {
+    allOrders = await apiFetch('/orders') || [];
+    renderAllOrders();
+  } catch { /* silent */ }
+}
+
+function osClass(s){return{Pending:'badge-pending',Received:'badge-received',Delivered:'badge-delivered'}[s]||'';}
+function psClass(s){return s==='Received'?'badge-received':'badge-pending';}
+
+function renderAllOrders() {
+  document.getElementById('wa-cntTotal').textContent     = allOrders.length;
+  document.getElementById('wa-cntPending').textContent   = allOrders.filter(o=>o.orderStatus==='Pending').length;
+  document.getElementById('wa-cntDelivered').textContent = allOrders.filter(o=>o.orderStatus==='Delivered').length;
+  document.getElementById('wa-cntPaid').textContent      = allOrders.filter(o=>o.paymentStatus==='Received').length;
+
+  const c = document.getElementById('allOrdersTable');
+  if (!allOrders.length) { c.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><h4>No orders yet</h4></div>`; return; }
+  c.innerHTML=`<div style="overflow-x:auto"><table class="data-table"><thead><tr>
+    <th>#</th><th>Customer</th><th>Total</th><th>Order</th><th>Payment</th><th>Time</th>
+  </tr></thead><tbody>${allOrders.map(o=>`<tr>
+    <td><strong>#${String(o.id).padStart(4,'0')}</strong></td>
+    <td>${escHtml(o.userName)}<br><small>${escHtml(o.userEmail)}</small></td>
+    <td><strong>Rs ${o.totalAmount.toFixed(0)}</strong></td>
+    <td><span class="badge-pill ${osClass(o.orderStatus)}" id="wa-os-${o.id}">${o.orderStatus}</span></td>
+    <td><span class="badge-pill ${psClass(o.paymentStatus)}" id="wa-ps-${o.id}">${o.paymentStatus}</span></td>
+    <td style="font-size:.78rem;color:var(--ink-soft)">${new Date(o.createdAt).toLocaleString()}</td>
+  </tr>`).join('')}</tbody></table></div>`;
+}
+
+// ── Users ────────────────────────────────────────────────────
+const currentAdminId = getUser()?.id;
+
+async function loadUsers() {
+  try {
+    const users = await apiFetch('/users') || [];
+    const c = document.getElementById('usersTable');
+    if (!users.length) { c.innerHTML=`<div class="empty-state"><div class="empty-icon">👥</div><h4>No users yet</h4></div>`; return; }
+    c.innerHTML=`<div style="overflow-x:auto"><table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+    <tbody>${users.map(u=>`<tr>
+      <td><strong>${escHtml(u.fullName)}</strong>${u.id===currentAdminId?' <span style="font-size:.7rem;color:var(--ink-soft)">(you)</span>':''}</td>
+      <td>${escHtml(u.email)}</td>
+      <td>${u.roleName}</td>
+      <td><span class="badge-pill ${u.isActive?'badge-active':'badge-disabled'}" id="user-status-${u.id}">${u.isActive?'Active':'Disabled'}</span></td>
+      <td style="font-size:.78rem;color:var(--ink-soft)">${new Date(u.createdAt).toLocaleDateString()}</td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn-ghost-sm" onclick="toggleUserStatus(${u.id},${u.isActive})">${u.isActive?'Disable':'Enable'}</button>
+        <button class="btn-ghost-sm" onclick="changeUserPassword(${u.id},'${escJsAttr(u.fullName)}')">Change Password</button>
+        ${u.id===currentAdminId?'':`<button class="btn-danger" onclick="deleteUser(${u.id},'${escJsAttr(u.fullName)}')">Delete</button>`}
+      </td>
+    </tr>`).join('')}</tbody></table></div>`;
+  } catch { /* silent */ }
+}
+
+function escJsAttr(s=''){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');}
+
+async function toggleUserStatus(id, currentlyActive) {
+  try {
+    await apiFetch(`/users/${id}/status`,{method:'PATCH',body:JSON.stringify({isActive:!currentlyActive})});
+    showToast('User status updated','success');
+    loadUsers();
+  } catch(e){showToast(e.message,'error');}
+}
+
+async function changeUserPassword(id, name) {
+  const pw = prompt(`Enter a new password for ${name} (min. 6 characters):`);
+  if (pw === null) return;
+  if (pw.trim().length < 6) { showToast('Password must be at least 6 characters.','error'); return; }
+  try {
+    const res = await apiFetch(`/users/${id}/password`,{method:'PATCH',body:JSON.stringify({newPassword:pw})});
+    showToast(res?.message || 'Password updated','success');
+  } catch(e){ showToast(e.message,'error'); loadUsers(); }
+}
+
+async function deleteUser(id, name) {
+  if (!confirm(`Delete ${name}? Their orders will be removed too. This cannot be undone.`)) return;
+  try {
+    const res = await apiFetch(`/users/${id}`,{method:'DELETE'});
+    showToast(res?.message || 'User deleted','success');
+    loadUsers();
+    loadOrders();
+  } catch(e){ showToast(e.message,'error'); loadUsers(); }
+}
+
+// ── Inbox ────────────────────────────────────────────────────
+async function loadInbox() {
+  try {
+    const msgs = await apiFetch('/contact') || [];
+    const unread = msgs.filter(m=>!m.isRead).length;
+    const badge = document.getElementById('unreadBadge');
+    if (unread > 0) { badge.textContent = unread; badge.style.display='inline'; }
+    else badge.style.display='none';
+
+    const c = document.getElementById('inboxContainer');
+    if (!msgs.length) { c.innerHTML=`<div class="empty-state"><div class="empty-icon">✉️</div><h4>No messages yet</h4></div>`; return; }
+    c.innerHTML=msgs.map(m=>`
+      <div class="inbox-item ${m.isRead?'':'unread'}" id="msg-${m.id}">
+        <div class="inbox-name">${escHtml(m.name)} <span style="color:var(--ink-soft);font-weight:400;font-size:.82rem">&lt;${escHtml(m.email)}&gt;</span></div>
+        <div class="inbox-meta"><span>${new Date(m.submittedAt).toLocaleString()}</span>${m.isRead?'<span style="color:var(--sage)">✓ Read</span>':'<span style="color:var(--clay)">● Unread</span>'}</div>
+        <div class="inbox-body">${escHtml(m.message)}</div>
+        ${!m.isRead?`<div class="inbox-actions"><button class="btn-ghost-sm" onclick="markRead(${m.id})">Mark as read</button></div>`:''}
+      </div>`).join('');
+  } catch { /* silent */ }
+}
+
+async function markRead(id) {
+  try { await apiFetch(`/contact/${id}/read`,{method:'PATCH'}); showToast('Marked as read','success'); loadInbox(); } catch(e){showToast(e.message,'error');}
+}
+
+// ── Daily view-only ──────────────────────────────────────────
+async function loadDailyView() {
+  try {
+    const items = await apiFetch('/daily-menu') || [];
+    const c = document.getElementById('dailyViewTable');
+    if (!items.length) { c.innerHTML=`<div class="empty-state"><div class="empty-icon">🌅</div><h4>No items today</h4></div>`; return; }
+    c.innerHTML=`<table class="data-table"><thead><tr><th>Item</th><th>Price</th><th>Qty</th><th>Status</th></tr></thead>
+    <tbody>${items.map(i=>`<tr>
+      <td><strong>${escHtml(i.name)}</strong></td>
+      <td>Rs ${i.price}</td>
+      <td>${i.quantity}</td>
+      <td><span class="badge-pill ${i.status==='Available'?'badge-available':'badge-soldout'}">${i.status}</span></td>
+    </tr>`).join('')}</tbody></table>`;
+  } catch { /* silent */ }
+}
+
+// ── SignalR ──────────────────────────────────────────────────
+async function setupSignalR() {
+  const hub = await getHubConnection();
+  if (!hub) return;
+  await hub.invoke('JoinWebsiteAdminGroup').catch(()=>{});
+
+  hub.on('NewOrder', order => {
+    allOrders.unshift(order);
+    renderAllOrders();
+    showToast('New order from ' + order.userName, 'success');
+  });
+  hub.on('OrderStatusUpdated', updated => {
+    const o = allOrders.find(x=>x.id===updated.id);
+    if (o) { o.orderStatus = updated.orderStatus; renderAllOrders(); }
+  });
+  hub.on('PaymentStatusUpdated', updated => {
+    const o = allOrders.find(x=>x.id===updated.id);
+    if (o) { o.paymentStatus = updated.paymentStatus; renderAllOrders(); }
+  });
+}
+
+loadAllMenu();
+loadOrders();
+loadUsers();
+loadInbox();
+loadDailyView();
+setupSignalR();
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+# ── Secrets (never commit) ──────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── .NET build output ───────────────────────────────────────────
+CafeAutomate.Api/bin/
+CafeAutomate.Api/obj/
+
+# ── SQLite database (dev only) ──────────────────────────────────
+*.db
+*.db-shm
+*.db-wal
+
+# ── Local SQLite data directory ─────────────────────────────────
+CafeAutomate.Api/App_Data/
+
+# ── OS / editor noise ───────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.user
+.vscode/
+.cursor/

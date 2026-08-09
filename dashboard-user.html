@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Orders — Cafe Automate</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍵</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+<div class="dash-topbar">
+  <div class="dash-logo">
+    <div class="dash-logo-mark">☕</div>
+    <div class="dash-logo-text">Cafe Automate<small>User Dashboard</small></div>
+  </div>
+  <div class="dash-user-info">
+    <span class="dash-role-badge">Customer</span>
+    <span class="dash-user-name" id="topbarName">—</span>
+    <a href="index.html" class="dash-logout-btn" style="margin-right:6px">← Site</a>
+    <button class="dash-logout-btn" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="dash-layout">
+  <aside class="dash-sidebar">
+    <button class="dash-nav-item active" onclick="showPanel('orders')" id="nav-orders">
+      <span class="dash-nav-icon">📋</span> My Orders
+    </button>
+    <button class="dash-nav-item" onclick="showPanel('profile')" id="nav-profile">
+      <span class="dash-nav-icon">👤</span> Profile
+    </button>
+  </aside>
+
+  <main class="dash-main">
+    <!-- ── My Orders ─────────────────────────────────────────── -->
+    <div class="dash-panel active" id="panel-orders">
+      <h1 class="dash-page-title">My Orders</h1>
+      <p class="dash-page-sub">Live status updates — no refresh needed.</p>
+
+      <div id="ordersContainer">
+        <div class="empty-state"><div class="empty-icon">📋</div><h4>Loading your orders…</h4></div>
+      </div>
+    </div>
+
+    <!-- ── Profile ───────────────────────────────────────────── -->
+    <div class="dash-panel" id="panel-profile">
+      <h1 class="dash-page-title">My Profile</h1>
+      <p class="dash-page-sub">Your account details.</p>
+      <div class="section-card">
+        <p><strong>Name:</strong> <span id="profileName">—</span></p><br>
+        <p><strong>Email:</strong> <span id="profileEmail">—</span></p><br>
+        <p><strong>Account type:</strong> Customer</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+<script src="js/api.js"></script>
+<script>
+(function guard() {
+  const u = getUser();
+  if (!u) { window.location.href = 'login.html'; return; }
+  if (u.role !== 3) { window.location.href = 'login.html'; return; }
+  document.getElementById('topbarName').textContent = u.name;
+  document.getElementById('profileName').textContent  = u.name;
+  document.getElementById('profileEmail').textContent = u.email;
+})();
+
+function showPanel(id) {
+  document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.dash-nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.getElementById('nav-' + id).classList.add('active');
+}
+
+function orderStatusClass(s) {
+  return { Pending: 'badge-pending', Received: 'badge-received', Delivered: 'badge-delivered' }[s] || '';
+}
+function payStatusClass(s)   { return s === 'Received' ? 'badge-received' : 'badge-pending'; }
+
+function renderOrder(o) {
+  const items = o.items.map(i => `
+    <div class="order-item-row">
+      <span>${i.itemName} × ${i.quantity} <em style="font-size:.75rem;color:var(--ink-soft)">(${i.sourceType === 'DailyMenu' ? 'Daily' : 'Menu'})</em></span>
+      <span>Rs ${i.lineTotal.toFixed(0)}</span>
+    </div>`).join('');
+
+  return `
+    <div class="section-card" id="order-card-${o.id}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+        <div>
+          <h3 style="font-size:1.05rem;margin-bottom:4px">Order #${String(o.id).padStart(4,'0')}</h3>
+          <p style="font-size:.8rem;color:var(--ink-soft)">${new Date(o.createdAt).toLocaleString()}</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="badge-pill ${orderStatusClass(o.orderStatus)}" id="os-${o.id}">📦 ${o.orderStatus}</span>
+          <span class="badge-pill ${payStatusClass(o.paymentStatus)}" id="ps-${o.id}">💳 ${o.paymentStatus}</span>
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:.88rem;">
+        <strong>Total: Rs ${o.totalAmount.toFixed(0)}</strong>
+        <button class="btn-ghost-sm" style="margin-left:12px" onclick="toggleItems(${o.id})">View items</button>
+      </div>
+      <div class="order-items-list" id="items-${o.id}">${items}</div>
+    </div>`;
+}
+
+function toggleItems(id) {
+  document.getElementById('items-' + id)?.classList.toggle('open');
+}
+
+async function loadOrders() {
+  try {
+    const orders = await apiFetch('/orders/mine');
+    const c = document.getElementById('ordersContainer');
+    if (!orders || orders.length === 0) {
+      c.innerHTML = `<div class="empty-state"><div class="empty-icon">🧺</div><h4>No orders yet</h4><p>Start browsing the menu!</p><br><a href="index.html" class="btn btn-clay">Browse Menu</a></div>`;
+      return;
+    }
+    c.innerHTML = orders.map(renderOrder).join('');
+    await setupSignalR(orders);
+  } catch {
+    document.getElementById('ordersContainer').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><h4>Could not load orders</h4></div>`;
+  }
+}
+
+async function setupSignalR(orders) {
+  const hub = await getHubConnection();
+  if (!hub) return;
+
+  orders.forEach(o => hub.invoke('JoinOrderGroup', String(o.id)).catch(() => {}));
+
+  hub.on('OrderStatusUpdated', updated => {
+    const el = document.getElementById('os-' + updated.id);
+    if (!el) return;
+    el.className = 'badge-pill ' + orderStatusClass(updated.orderStatus) + ' status-updated';
+    el.textContent = '📦 ' + updated.orderStatus;
+    showToast('Order #' + String(updated.id).padStart(4,'0') + ' is now ' + updated.orderStatus);
+  });
+
+  hub.on('PaymentStatusUpdated', updated => {
+    const el = document.getElementById('ps-' + updated.id);
+    if (!el) return;
+    el.className = 'badge-pill ' + payStatusClass(updated.paymentStatus) + ' status-updated';
+    el.textContent = '💳 ' + updated.paymentStatus;
+    showToast('Payment for order #' + String(updated.id).padStart(4,'0') + ' is ' + updated.paymentStatus);
+  });
+}
+
+loadOrders();
+</script>
+</body>
+</html>
