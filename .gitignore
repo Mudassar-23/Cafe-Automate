@@ -21,3 +21,4 @@ Thumbs.db
 *.user
 .vscode/
 .cursor/
+.IMPLEMENTATION_PLAN.md
