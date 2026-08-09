@@ -20,5 +20,4 @@ CafeAutomate.Api/App_Data/
 Thumbs.db
 *.user
 .vscode/
-.cursor/
-.IMPLEMENTATION_PLAN.md
+IMPLEMENTATION_PLAN.md
