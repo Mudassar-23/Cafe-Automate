@@ -31,16 +31,17 @@ public class AuthController : ControllerBase
         if (req.Password.Length < 6)
             return BadRequest(new { error = "Password must be at least 6 characters." });
 
-        if (!req.Email.Trim().ToLower().EndsWith("@stewart.com"))
-            return BadRequest(new { error = "Only @stewart.com email addresses are allowed to register." });
+        var email = req.Email.Trim().ToLower();
+        if (!email.EndsWith("@stewart.com") && !email.EndsWith("@gmail.com"))
+            return BadRequest(new { error = "Only @stewart.com or @gmail.com email addresses are allowed to register." });
 
-        if (await _db.Users.AnyAsync(u => u.Email == req.Email.ToLower()))
+        if (await _db.Users.AnyAsync(u => u.Email == email))
             return Conflict(new { error = "An account with this email already exists." });
 
         var user = new User
         {
             FullName = req.FullName.Trim(),
-            Email = req.Email.ToLower().Trim(),
+            Email = email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.Password),
             Role = UserRole.User
         };

@@ -103,7 +103,8 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
   const password  = document.getElementById('signupPassword').value;
   const confirm   = document.getElementById('signupConfirm').value;
 
-  if (!email.toLowerCase().endsWith('@stewart.com')) { showError('signup', 'Only @stewart.com email addresses can register.'); return; }
+  const emailLower = email.toLowerCase();
+  if (!emailLower.endsWith('@stewart.com') && !emailLower.endsWith('@gmail.com')) { showError('signup', 'Only @stewart.com or @gmail.com email addresses can register.'); return; }
   if (password !== confirm) { showError('signup', 'Passwords do not match.'); return; }
   if (password.length < 6)  { showError('signup', 'Password must be at least 6 characters.'); return; }
 
